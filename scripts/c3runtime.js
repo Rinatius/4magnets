@@ -450,6 +450,18 @@ self["C3_Shaders"] = {};
 
 "use strict";C3.Plugins.TextBox.Exps={Text(){return this._text}};
 
+"use strict";{C3.Plugins.Button=class extends C3.SDKDOMPluginBase{constructor(a){super(a,"button"),this.AddElementMessageHandler("click",(a,b)=>a._OnClick(b))}Release(){super.Release()}}}
+
+"use strict";C3.Plugins.Button.Type=class extends C3.SDKTypeBase{constructor(a){super(a)}Release(){super.Release()}OnCreate(){}};
+
+"use strict";{C3.Plugins.Button.Instance=class extends C3.SDKDOMInstanceBase{constructor(a,b){super(a,"button"),this._text="OK",this._isCheckbox=!1,this._isChecked=!1,this._title="",this._id="",this._isEnabled=!0,this._autoFontSize=!0,b&&(this._isCheckbox=1===b[0],this._text=b[1],this._title=b[2],this.GetWorldInfo().SetVisible(b[3]),this._isEnabled=b[4],this._autoFontSize=b[5],this._isChecked=b[6],this._id=b[7]),this.CreateElement()}Release(){super.Release()}GetElementState(){return{"text":this._text,"isCheckbox":this._isCheckbox,"isChecked":this._isChecked,"title":this._title,"id":this._id,"isVisible":this.GetWorldInfo().IsVisible(),"isEnabled":this._isEnabled}}async _OnClick(a){this._isChecked=a["isChecked"],await this.TriggerAsync(C3.Plugins.Button.Cnds.OnClicked)}Draw(){}SaveToJson(){return{"text":this._text,"checked":this._isChecked,"title":this._title,"enabled":this._isEnabled}}LoadFromJson(a){this._text=a["text"],this._isChecked=a["checked"],this._title=a["title"],this._isEnabled=a["enabled"],this.UpdateElementState()}GetPropertyValueByIndex(a){return 1===a?this._text:2===a?this._title:4===a?this._isEnabled:5===a?this._autoFontSize:6===a?this._isChecked:7===a?this._id:void 0}SetPropertyValueByIndex(a,b){switch(a){case 1:if(this._text===b)return;this._text=b,this.UpdateElementState();break;case 2:if(this._title===b)return;this._title=b,this.UpdateElementState();break;case 4:if(this._isEnabled===!!b)return;this._isEnabled=!!b,this.UpdateElementState();break;case 5:this._autoFontSize=!!b;break;case 6:if(this._isChecked===!!b)return;this._isChecked=!!b,this.UpdateElementState();break;case 7:if(this._id===!!b)return;this._id=b,this.UpdateElementState();}}GetDebuggerProperties(){const a=C3.Plugins.Button.Acts;return[{title:"plugins.button.name",properties:[{name:"plugins.button.properties.text.name",value:this._text,onedit:(b)=>this.CallAction(a.SetText,b)},{name:"plugins.button.properties.enabled.name",value:this._isEnabled,onedit:(b)=>this.CallAction(a.SetEnabled,b)},{name:"plugins.button.properties.checked.name",value:this._isChecked,onedit:(b)=>this.CallAction(a.SetChecked,b)}]}]}}}
+
+"use strict";C3.Plugins.Button.Cnds={OnClicked(){return!0},IsChecked(){return this._isChecked},CompareText(a,b){return b?this._text===a:C3.equalsNoCase(this._text,a)}};
+
+"use strict";C3.Plugins.Button.Acts={SetText(a){this._text===a||(this._text=a,this.UpdateElementState())},SetTooltip(a){this._title===a||(this._title=a,this.UpdateElementState())},SetVisible(a){const b=this.GetWorldInfo();a=0!==a;b.IsVisible()===a||b.SetVisible(a)},SetEnabled(a){a=!!a;this._isEnabled===a||(this._isEnabled=a,this.UpdateElementState())},SetFocus(){this.FocusElement()},SetBlur(){this.BlurElement()},SetCSSStyle(a,b){this.SetElementCSSStyle(a,b)},SetChecked(a){this._isCheckbox&&(a=0!==a,this._isChecked===a||(this._isChecked=a,this.UpdateElementState()))},ToggleChecked(){this._isCheckbox&&(this._isChecked=!this._isChecked,this.UpdateElementState())}};
+
+"use strict";C3.Plugins.Button.Exps={Text(){return this._text}};
+
 "use strict";{let a=null,b=null,c=[],d=null;const e="Physics_DisabledCollisions";C3.Behaviors.Physics=class extends C3.SDKBehaviorBase{constructor(a){super(a),this._world=null,this._worldG=10,this._worldScale=.02,this._lastUpdateTick=-1,this._steppingMode=0,this._velocityIterations=8,this._positionIterations=3,this._allCollisionsEnabled=!0,this._runtime.AddLoadPromise(this._LoadBox2DWasm())}async _LoadBox2DWasm(){const a=await this._runtime.GetAssetManager().FetchBlob("box2d.wasm"),b=URL.createObjectURL(a);await new Promise((a)=>{self["Box2DWasmModule"]({"wasmBinaryFile":b}).then((b)=>{d=b,this._InitBox2DWorld(),a()})})}_InitBox2DWorld(){const c=this._runtime.GetCollisionEngine();a=C3.Behaviors.Physics.GetVec2(0,0),b=C3.Behaviors.Physics.GetVec2(0,0),this._world=new d["b2World"](C3.Behaviors.Physics.GetTempVec2A(0,this._worldG),!0);const f=new d["JSContactListener"];f["BeginContact"]=(a)=>{const b=d["wrapPointer"](a,d["b2Contact"]),e=C3.Behaviors.Physics.Instance.LookupBehInstFromBody(b["GetFixtureA"]()["GetBody"]()),f=C3.Behaviors.Physics.Instance.LookupBehInstFromBody(b["GetFixtureB"]()["GetBody"]());c.RegisterCollision(e.GetObjectInstance(),f.GetObjectInstance())},f["EndContact"]=()=>{},f["PreSolve"]=()=>{},f["PostSolve"]=()=>{},this._world["SetContactListener"](f);const g=new d["JSContactFilter"];g["ShouldCollide"]=(a,b)=>{if(this._allCollisionsEnabled)return!0;const c=d["wrapPointer"](a,d["b2Fixture"]),f=d["wrapPointer"](b,d["b2Fixture"]),g=C3.Behaviors.Physics.Instance.LookupBehInstFromBody(c["GetBody"]()),h=C3.Behaviors.Physics.Instance.LookupBehInstFromBody(f["GetBody"]()),i=g.GetObjectInstance().GetObjectClass(),j=h.GetObjectInstance().GetObjectClass(),k=i.GetSID(),l=j.GetSID(),m=i.GetSavedDataMap().get(e);if(m&&m.has(l))return!1;const n=j.GetSavedDataMap().get(e);return!(n&&n.has(k))},this._world["SetContactFilter"](g)}Release(){super.Release()}GetBox2D(){return d}GetWorld(){return this._world}GetWorldScale(){return this._worldScale}GetSteppingMode(){return this._steppingMode}SetSteppingMode(a){this._steppingMode=a}SetLastUpdateTick(a){this._lastUpdateTick=a}GetLastUpdateTick(){return this._lastUpdateTick}GetVelocityIterations(){return this._velocityIterations}GetPositionIterations(){return this._positionIterations}SetIterations(a,b){this._velocityIterations=a,this._positionIterations=b}GetGravity(){return this._worldG}SetGravity(a){a===this._worldG||(this._world["SetGravity"](C3.Behaviors.Physics.GetTempVec2A(0,a)),this._worldG=a,this._WakeUpAllPhysicsBodies())}_WakeUpAllPhysicsBodies(){for(const a of this.GetInstances()){const b=C3.Behaviors.Physics.Instance.LookupBehInstFromInst(a);if(!b)continue;const c=b.GetBody();c&&c["SetAwake"](!0)}}DisableShouldCollideFastPath(){this._allCollisionsEnabled=!1}static GetPhysicsCollisionKey(){return e}static GetVec2(a,b){if(c.length){const d=c.pop();return d["set_x"](a),d["set_y"](b),d}else{const c=d["b2Vec2"];return new c(a,b)}}static FreeVec2(a){c.push(a)}static GetTempVec2A(b,c){return a["set_x"](b),a["set_y"](c),a}static GetTempVec2B(a,c){return b["set_x"](a),b["set_y"](c),b}static CreatePolygonShape(a){const b=d["b2PolygonShape"],c=new b,e=d["_malloc"](8*a.length);let f=0;for(let b=0;b<a.length;++b)d["HEAPF32"][e+f>>2]=a[b]["get_x"](),d["HEAPF32"][e+(f+4)>>2]=a[b]["get_y"](),f+=8;const g=d["wrapPointer"](e,d["b2Vec2"]);return c["Set"](g,a.length),d["_free"](e),c}}}
 
 "use strict";C3.Behaviors.Physics.Type=class extends C3.SDKBehaviorTypeBase{constructor(a){super(a)}Release(){super.Release()}OnCreate(){}};
@@ -470,18 +482,25 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite,
 		C3.Behaviors.Physics,
 		C3.Plugins.TextBox,
+		C3.Plugins.Button,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Behaviors.Physics.Acts.SetWorldGravity,
 		C3.Plugins.System.Cnds.EveryTick,
-		C3.Behaviors.Physics.Acts.ApplyForceToward,
+		C3.Plugins.System.Cnds.CompareBoolVar,
+		C3.Plugins.TextBox.Acts.SetText,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
-		C3.Plugins.TextBox.Acts.SetText,
+		C3.Plugins.System.Cnds.ForEachOrdered,
+		C3.Behaviors.Physics.Acts.ApplyForceToward,
 		C3.Plugins.TextBox.Cnds.OnTextChanged,
+		C3.Plugins.System.Cnds.PickNth,
+		C3.Plugins.TextBox.Exps.IID,
 		C3.Plugins.Sprite.Acts.SetInstanceVar,
 		C3.Plugins.TextBox.Exps.Text,
 		C3.Plugins.Sprite.Acts.SetPos,
-		C3.Plugins.System.Exps.int
+		C3.Plugins.System.Exps.int,
+		C3.Plugins.Button.Cnds.OnClicked,
+		C3.Plugins.System.Acts.SetBoolVar
 	];
 };
 
@@ -584,6 +603,10 @@ self.C3_GetObjectRefTable = function () {
 		() => 0,
 p => {
 const n0 = p._GetNode(0);
+return () => (n0.ExpObject()).toString();
+},
+p => {
+const n0 = p._GetNode(0);
 const n1 = p._GetNode(1);
 const n2 = p._GetNode(2);
 const n3 = p._GetNode(3);
@@ -593,10 +616,6 @@ return () => (n0.ExpInstVar() / (Math.pow((n1.ExpObject() - n2.ExpObject()), 2) 
 p => {
 const n0 = p._GetNode(0);
 return () => n0.ExpObject();
-},
-p => {
-const n0 = p._GetNode(0);
-return () => (n0.ExpObject()).toString();
 },
 p => {
 const f0 = p._GetNode(0).GetBoundMethod();
