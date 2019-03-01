@@ -500,7 +500,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Acts.SetPos,
 		C3.Plugins.System.Exps.int,
 		C3.Plugins.Button.Cnds.OnClicked,
-		C3.Plugins.System.Acts.SetBoolVar
+		C3.Plugins.System.Acts.SetBoolVar,
+		C3.Plugins.System.Acts.RestartLayout,
+		C3.Plugins.System.Acts.ResetGlobals
 	];
 };
 
